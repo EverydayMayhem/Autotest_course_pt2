@@ -10,30 +10,37 @@ from atf.ui import Region, TextField, Button, ExactText, CustomList, UrlExact, E
     ContainsText, CountElements
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver import Keys, ActionChains
+from selenium.webdriver import Keys
 
-class AuthPage(Region):
-    login = TextField(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__login'] input", "логин")
-    password = TextField(By.CSS_SELECTOR, "[type = 'password']", "пароль")
-    enter_btn = Button(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__checkSignInTypeButton']", "кнопка авторизации")
+from Auto_auth import *
+
+# class AuthPage(Region):
+#     login = TextField(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__login'] input", "логин")
+#     password = TextField(By.CSS_SELECTOR, "[type = 'password']", "пароль")
+#     enter_btn = Button(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__checkSignInTypeButton']",
+#                        "кнопка авторизации")
+
 
 class MainPageOnline(Region):
     main_contact_menu = Button(By.CSS_SELECTOR, "[data-qa='Контакты']", "Контакты в главном аккордеоне")
+
 
 class Contacts(Region):
     plus_btn = Button(By.CSS_SELECTOR, "[data-qa='sabyPage-addButton']", "Кнопка плюс")
     registry_slate = Element(By.CSS_SELECTOR, ".msg-dialogs-detail", "Контентная область")
     dialog_list = CustomList(By.CSS_SELECTOR, ".msg-dialogs-item", "Сообщения")
-    contacts_search = TextField(By.CSS_SELECTOR, ".addressee-selector-popup__browser-search-area-wrapper input", "Строка поиска")
+    contacts_search = TextField(By.CSS_SELECTOR, ".addressee-selector-popup__browser-search-area-wrapper input",
+                                "Строка поиска")
     adressee_list = CustomList(By.CSS_SELECTOR, ".msg-addressee-selector__addressee", "Список получателей")
     msg_window = TextField(By.CSS_SELECTOR, "[data-qa='textEditor_slate_Field']", "Поле ввода сообщения")
     send_btn = Button(By.CSS_SELECTOR, "[data-qa='msg-send-editor__send-button']", "Кнопка отправить")
     close_btn = Button(By.CSS_SELECTOR, "[data-qa='controls-stack-Button__close']", "Кнопка закрыть")
     delete_btn = Button(By.CSS_SELECTOR, "[title = 'Перенести в удаленные']", "Кнопка удаления из реестра")
 
-class Test(TestCaseUI):
 
-    def test(self):
+class TestMessage(TestCaseUI):
+
+    def test_message(self):
         sbis_site = self.config.get("SBIS_SITE")
 
         log(f'Перейти на {sbis_site}')
@@ -41,11 +48,12 @@ class Test(TestCaseUI):
 
         log("Авторизовываемся")
         auth_page = AuthPage(self.driver)
-        user_login, user_password = self.config.get("USER_LOGIN"), self.config.get("USER_PASSWORD")
-        auth_page.login.type_in(user_login)
-        auth_page.enter_btn.click()
-        auth_page.login.should_be(ExactText(user_login))
-        auth_page.password.type_in(user_password + Keys.ENTER)
+        auth_page.authorize()
+        # user_login, user_password = self.config.get("USER_LOGIN"), self.config.get("USER_PASSWORD")
+        # auth_page.login.type_in(user_login)
+        # auth_page.enter_btn.click()
+        # auth_page.login.should_be(ExactText(user_login))
+        # auth_page.password.type_in(user_password + Keys.ENTER)
 
         log("Переходим в реестр Контакты")
         main_page = MainPageOnline(self.driver)
@@ -67,7 +75,7 @@ class Test(TestCaseUI):
         contacts_page.close_btn.click()
 
         log("Проверяем появилось ли наше сообщение в реестре")
-        contacts_page.dialog_list.should_be(CountElements(messages_before+1))
+        contacts_page.dialog_list.should_be(CountElements(messages_before + 1))
         contacts_page.dialog_list.item(1).should_be(ContainsText(user_message))
 
         log("Удаляем сообщение")
