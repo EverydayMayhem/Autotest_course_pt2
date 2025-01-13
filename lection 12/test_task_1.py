@@ -12,7 +12,7 @@ from atf.ui import Region, TextField, Button, ExactText, CustomList, UrlExact, E
 from selenium.webdriver.common.by import By
 from selenium.webdriver import Keys
 
-from Auto_auth import *
+from Auth_page import *
 
 # class AuthPage(Region):
 #     login = TextField(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__login'] input", "логин")
@@ -23,7 +23,7 @@ from Auto_auth import *
 
 class MainPageOnline(Region):
     main_contact_menu = Button(By.CSS_SELECTOR, "[data-qa='Контакты']", "Контакты в главном аккордеоне")
-
+    sub_contact_menu = Button(By.CSS_SELECTOR, ".NavigationPanels-SubMenu__head", "Контакты в выпадающем аккордеоне")
 
 class Contacts(Region):
     plus_btn = Button(By.CSS_SELECTOR, "[data-qa='sabyPage-addButton']", "Кнопка плюс")
@@ -49,16 +49,12 @@ class TestMessage(TestCaseUI):
         log("Авторизовываемся")
         auth_page = AuthPage(self.driver)
         auth_page.authorize()
-        # user_login, user_password = self.config.get("USER_LOGIN"), self.config.get("USER_PASSWORD")
-        # auth_page.login.type_in(user_login)
-        # auth_page.enter_btn.click()
-        # auth_page.login.should_be(ExactText(user_login))
-        # auth_page.password.type_in(user_password + Keys.ENTER)
 
         log("Переходим в реестр Контакты")
         main_page = MainPageOnline(self.driver)
         main_page.main_contact_menu.click()
-        self.browser.should_be(UrlExact("https://fix-online.sbis.ru/page/dialogs"))
+        main_page.sub_contact_menu.should_be(Displayed)
+        main_page.sub_contact_menu.click()
 
         log("Ищем получателя")
         contacts_page = Contacts(self.driver)
@@ -85,3 +81,4 @@ class TestMessage(TestCaseUI):
         log("Проверяем удалилось ли")
         contacts_page.dialog_list.item(1).should_not_be(ContainsText(user_message))
         contacts_page.dialog_list.should_be(CountElements(messages_before))
+
