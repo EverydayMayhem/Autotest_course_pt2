@@ -6,37 +6,11 @@
 
 from atf import *
 from atf.pytest_core.base.case_ui import TestCaseUI
-from atf.ui import Region, TextField, Button, ExactText, CustomList, UrlExact, Enabled, Displayed, Element, \
-    ContainsText, CountElements
+from atf.ui import Displayed, ContainsText, CountElements
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver import Keys
-
-from Auth_page import *
-
-# class AuthPage(Region):
-#     login = TextField(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__login'] input", "логин")
-#     password = TextField(By.CSS_SELECTOR, "[type = 'password']", "пароль")
-#     enter_btn = Button(By.CSS_SELECTOR, "[data-qa='auth-AdaptiveLoginForm__checkSignInTypeButton']",
-#                        "кнопка авторизации")
-
-
-class MainPageOnline(Region):
-    main_contact_menu = Button(By.CSS_SELECTOR, "[data-qa='Контакты']", "Контакты в главном аккордеоне")
-    sub_contact_menu = Button(By.CSS_SELECTOR, ".NavigationPanels-SubMenu__head", "Контакты в выпадающем аккордеоне")
-
-class Contacts(Region):
-    plus_btn = Button(By.CSS_SELECTOR, "[data-qa='sabyPage-addButton']", "Кнопка плюс")
-    registry_slate = Element(By.CSS_SELECTOR, ".msg-dialogs-detail", "Контентная область")
-    dialog_list = CustomList(By.CSS_SELECTOR, ".msg-dialogs-item", "Сообщения")
-    contacts_search = TextField(By.CSS_SELECTOR, ".addressee-selector-popup__browser-search-area-wrapper input",
-                                "Строка поиска")
-    adressee_list = CustomList(By.CSS_SELECTOR, ".msg-addressee-selector__addressee", "Список получателей")
-    msg_window = TextField(By.CSS_SELECTOR, "[data-qa='textEditor_slate_Field']", "Поле ввода сообщения")
-    send_btn = Button(By.CSS_SELECTOR, "[data-qa='msg-send-editor__send-button']", "Кнопка отправить")
-    close_btn = Button(By.CSS_SELECTOR, "[data-qa='controls-stack-Button__close']", "Кнопка закрыть")
-    delete_btn = Button(By.CSS_SELECTOR, "[title = 'Перенести в удаленные']", "Кнопка удаления из реестра")
-
+from pages.Auth_page import *
+from pages.Main_page import MainPage
+from pages.Contacts_page import Contacts
 
 class TestMessage(TestCaseUI):
 
@@ -51,15 +25,15 @@ class TestMessage(TestCaseUI):
         auth_page.authorize()
 
         log("Переходим в реестр Контакты")
-        main_page = MainPageOnline(self.driver)
-        main_page.main_contact_menu.click()
-        main_page.sub_contact_menu.should_be(Displayed)
-        main_page.sub_contact_menu.click()
+        main_page = MainPage(self.driver)
+        main_page.contact_menu.click()
+        main_page.contact_submenu_head.should_be(Displayed)
+        main_page.contact_submenu_head.click()
 
         log("Ищем получателя")
         contacts_page = Contacts(self.driver)
         user_message, user_name = self.config.get("USER_MESSAGE"), self.config.get("USER_NAME")
-        contacts_page.registry_slate.should_be(Displayed)
+        contacts_page.registry_slate.should_be(Displayed, wait_time=10)
         messages_before = contacts_page.dialog_list.size
         contacts_page.plus_btn.click()
         contacts_page.contacts_search.type_in(user_name)
@@ -81,4 +55,3 @@ class TestMessage(TestCaseUI):
         log("Проверяем удалилось ли")
         contacts_page.dialog_list.item(1).should_not_be(ContainsText(user_message))
         contacts_page.dialog_list.should_be(CountElements(messages_before))
-
