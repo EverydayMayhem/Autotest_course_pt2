@@ -26,13 +26,11 @@ class TestMessage(TestCaseUI):
 
         log("Переходим в реестр Контакты")
         main_page = MainPage(self.driver)
-        main_page.contact_menu.click()
-        main_page.contact_submenu_head.should_be(Displayed)
-        main_page.contact_submenu_head.click()
+        main_page.dropdown_accordion('Контакты')
 
         log("Ищем получателя")
         contacts_page = Contacts(self.driver)
-        user_message, user_name = self.config.get("USER_MESSAGE"), self.config.get("USER_NAME")
+        user_message, user_name = self.config.USER_MESSAGE, self.config.USER_NAME
         contacts_page.registry_slate.should_be(Displayed, wait_time=10)
         messages_before = contacts_page.dialog_list.size
         contacts_page.plus_btn.click()
