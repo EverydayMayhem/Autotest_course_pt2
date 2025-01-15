@@ -26,7 +26,7 @@ class TestTaskRegistry(TestCaseUI):
 
         log("Авторизовываемся")
         auth_page = AuthPage(self.driver)
-        auth_page.authorize()
+        auth_page.auth(self.config.USER_LOGIN, self.config.USER_PASSWORD)
 
         log("Переходим в реестр задач через аккордеон")
         main_page = MainPage(self.driver)

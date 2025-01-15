@@ -7,13 +7,15 @@
 
 from atf import *
 from atf.pytest_core.base.case_ui import TestCaseUI
-from atf.ui import Displayed, Element, TitleExact
+from atf.ui import Displayed, TitleExact
 
 from pages.Auth_page import *
 from pages.Main_page import MainPage
 from pages.Specific_tasks_page import SpecificTask
 
+
 class TestSpecificTask(TestCaseUI):
+
     def test_my_task(self):
         sbis_site = self.config.get("SBIS_SITE")
 
@@ -22,7 +24,7 @@ class TestSpecificTask(TestCaseUI):
 
         log("Авторизовываемся")
         auth_page = AuthPage(self.driver)
-        auth_page.authorize()
+        auth_page.auth(self.config.USER_LOGIN, self.config.USER_PASSWORD)
         main_page = MainPage(self.driver)
         main_page.task_menu.should_be(Displayed, wait_time=10)
 

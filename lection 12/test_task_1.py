@@ -22,7 +22,7 @@ class TestMessage(TestCaseUI):
 
         log("Авторизовываемся")
         auth_page = AuthPage(self.driver)
-        auth_page.authorize()
+        auth_page.auth(self.config.USER_LOGIN, self.config.USER_PASSWORD)
 
         log("Переходим в реестр Контакты")
         main_page = MainPage(self.driver)
